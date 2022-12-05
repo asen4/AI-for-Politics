@@ -4,9 +4,9 @@ import keys
 import tweepy
 from Tweet import Tweet
 
-from pprint import pprint
 import gensim
 import gensim.corpora as corpora
+from pprint import pprint
 import re
 import spacy
 import string
@@ -37,7 +37,7 @@ def preprocessMessage(tweets_list):
     # Remove any URL from the tweets, if any.
     tweets_list = [re.sub("http\S+", "", tweet) for tweet in tweets_list]
 
-    # Break the sentence(s) into individual words.
+    # Break the sentence(s) into individual tokens/words.
     tweets_list = list(tokenize(tweets_list))
 
     # Omit stop words.
@@ -56,7 +56,7 @@ def preprocessMessage(tweets_list):
     tweet_bigrams = [bigram_mod[word] for word in tweets_list]
 
     # Perform lemmatization, keeping only nouns, adjectives, adverbs, and verbs.
-    tweets_list = lemmatization(tweet_bigrams, allowed_postags=['NOUN', 'ADJ', 'VERB', 'ADV'])
+    tweets_list = lemmatization(tweet_bigrams, allowed_postags = ['NOUN', 'ADJ', 'VERB', 'ADV'])
     
     return tweets_list
 
@@ -93,7 +93,7 @@ def remove_stopwords(texts):
 
 def tokenize(sentences):
     for sentence in sentences:
-        yield (gensim.utils.simple_preprocess(str(sentence), deacc=True))
+        yield gensim.utils.simple_preprocess(str(sentence), deacc=True)
 
 
 
@@ -198,8 +198,6 @@ api_key_secret = keys.api_key_secret
 access_token = keys.access_token
 access_token_secret = keys.access_token_secret
 bearer_token = keys.bearer_token
-consumer_key = keys.consumer_key
-consumer_secret = keys.consumer_secret
 
 # Perform authenticatation.
 auth = tweepy.OAuthHandler(api_key, api_key_secret)
@@ -264,13 +262,12 @@ for city in big_cities:
     places = api.search_geo(query = city, granularity = "city")
     place_id = places[0].id
 
-    if " " in city:
-        for place in places:
-            if place.name == city and place.place_type == "city":
-                place_id = place.id
-                break
+    for place in places:
+        if place.name == city and place.place_type == "city":
+            place_id = place.id
+            break
 
-    # IMPORTANT: Change the '1' in the following line to 10K once finished. For now, keeping it as '1' will allow for easy and quick testing.
+    # IMPORTANT: Change the '5' in the following line to 10K once finished. For now, keeping it as '5' will allow for easy and quick testing.
     tweets_list = scrapeTweetsByLocation(place_id, 5)
     # print(tweets_list)
 
